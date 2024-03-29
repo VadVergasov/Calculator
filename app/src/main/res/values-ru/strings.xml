@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name_display">Калькулятор</string>
+
+    <string name="menu_clear_history">Очистить историю</string>
+
+    <string name="division_by_0">Нельзя делить на 0</string>
+    <string name="domain_error">Ошибка значения</string>
+    <string name="syntax_error">Синтаксичексая ошибка</string>
+    <string name="value_too_large">Значение слишком большое</string>
+
+    <string name="copied_result">Результат скопирован</string>
+    <string name="copied_history_calculation">Скопирована история вычислений</string>
+    <string name="copied_history_result">Скорирован результат из истории</string>
+
+    <string name="value_copied">Скопировано</string>
+    <string name="infinity">Бесконечность</string>
+    <string name="require_real_number">Необходимо вещественное число</string>
+</resources>

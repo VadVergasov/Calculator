@@ -7,6 +7,10 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.SharedPreferences
+import android.hardware.Sensor
+import android.hardware.SensorEvent
+import android.hardware.SensorEventListener
+import android.hardware.SensorManager
 import android.os.Build
 import android.os.Bundle
 import android.text.Editable
@@ -34,6 +38,7 @@ import kotlinx.coroutines.withContext
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.text.DecimalFormatSymbols
+import kotlin.math.sqrt
 
 var currentTheme: Int = 0
 
@@ -48,14 +53,14 @@ class MainActivity : AppCompatActivity() {
     private val groupingSeparatorSymbol =
         DecimalFormatSymbols.getInstance().groupingSeparator.toString()
 
-    private lateinit var preferences: SharedPreferences
+    private var preferences: SharedPreferences? = null
 
     private var history: String?
-        set(value) = preferences.edit().putString(KEY_HISTORY, value).apply()
+        set(value) = preferences!!.edit().putString(KEY_HISTORY, value).apply()
         get() = preferences?.getString(KEY_HISTORY, null)
 
     private var historySize: String?
-        set(value) = preferences.edit().putString(KEY_HISTORY_SIZE, value).apply()
+        set(value) = preferences!!.edit().putString(KEY_HISTORY_SIZE, value).apply()
         get() =  preferences?.getString(KEY_HISTORY_SIZE, null);
 
     private var isInvButtonClicked = false
@@ -69,10 +74,38 @@ class MainActivity : AppCompatActivity() {
     private lateinit var historyAdapter: HistoryAdapter
     private lateinit var historyLayoutMgr: LinearLayoutManager
 
+    private var sensorManager: SensorManager? = null
+    private var acceleration = 0f
+    private var currentAcceleration = 0f
+    private var lastAcceleration = 0f
+
+    private val sensorListener: SensorEventListener = object : SensorEventListener {
+        override fun onSensorChanged(event: SensorEvent) {
+
+            // Fetching x,y,z values
+            val x = event.values[0]
+            val y = event.values[1]
+            lastAcceleration = currentAcceleration
+
+            // Getting current accelerations
+            currentAcceleration = sqrt((x * x + y * y).toDouble()).toFloat()
+            val delta: Float = currentAcceleration - lastAcceleration
+            acceleration = acceleration * 0.8f + delta
+
+            if (acceleration > 8) {
+                binding.input.setText("")
+                binding.resultDisplay.text = ""
+            }
+        }
+        override fun onAccuracyChanged(sensor: Sensor, accuracy: Int) {}
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         preferences = PreferenceManager.getDefaultSharedPreferences(applicationContext)
-        history = preferences.getString(KEY_HISTORY, null)
-        historySize = preferences.getString(KEY_HISTORY_SIZE, "100")
+        history = preferences?.getString(KEY_HISTORY, null)
+        historySize = preferences?.getString(KEY_HISTORY_SIZE, "100")
+
+        sensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
 
         super.onCreate(savedInstanceState)
 
@@ -462,7 +495,7 @@ class MainActivity : AppCompatActivity() {
         updateDisplay(view, (view as Button).text as String)
     }
 
-    fun scientistModeSwitchButton(view: View) {
+    fun scientistModeSwitchButton(@Suppress("UNUSED_PARAMETER") view: View) {
         enableOrDisableScientistMode()
     }
 
@@ -812,14 +845,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun leftParenthesisButton(view: View) {
-        updateDisplay(view, "(")
-    }
-
-    fun rightParenthesisButton(view: View) {
-        updateDisplay(view, ")")
-    }
-
     fun parenthesesButton(view: View) {
         val cursorPosition = binding.input.selectionStart
         val textLength = binding.input.text.length
@@ -924,6 +949,9 @@ class MainActivity : AppCompatActivity() {
 
     // Update settings
     override fun onResume() {
+        sensorManager?.registerListener(sensorListener, sensorManager!!.getDefaultSensor(
+            Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_NORMAL
+        )
         super.onResume()
 
         // Update the theme
@@ -945,9 +973,14 @@ class MainActivity : AppCompatActivity() {
         binding.input.showSoftInputOnFocus = false
     }
 
+    override fun onPause() {
+        sensorManager!!.unregisterListener(sensorListener)
+        super.onPause()
+    }
+
     private fun getHistory(): MutableList<History> {
         val gson = Gson()
-        return if (preferences.getString(KEY_HISTORY, null) != null) {
+        return if (preferences?.getString(KEY_HISTORY, null) != null) {
             gson.fromJson(history, Array<History>::class.java).asList().toMutableList()
         } else {
             mutableListOf()
