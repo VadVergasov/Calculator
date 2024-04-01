@@ -28,6 +28,9 @@ import androidx.core.content.ContextCompat
 import androidx.preference.PreferenceManager
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.firebase.analytics.FirebaseAnalytics
+import com.google.firebase.analytics.ktx.analytics
+import com.google.firebase.ktx.Firebase
 import com.google.gson.Gson
 import com.vadvergasov.calculator.databinding.ActivityMainBinding
 import com.sothree.slidinguppanel.PanelSlideListener
@@ -79,6 +82,8 @@ class MainActivity : AppCompatActivity() {
     private var currentAcceleration = 0f
     private var lastAcceleration = 0f
 
+    private lateinit var firebaseAnalytics: FirebaseAnalytics
+
     private val sensorListener: SensorEventListener = object : SensorEventListener {
         override fun onSensorChanged(event: SensorEvent) {
 
@@ -106,6 +111,8 @@ class MainActivity : AppCompatActivity() {
         historySize = preferences?.getString(KEY_HISTORY_SIZE, "100")
 
         sensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
+
+        firebaseAnalytics = Firebase.analytics
 
         super.onCreate(savedInstanceState)
 
