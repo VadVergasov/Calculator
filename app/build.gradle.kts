@@ -1,16 +1,23 @@
+import java.util.Properties
+import java.io.FileInputStream
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("com.google.gms.google-services")
 }
 
+val keystorePropertiesFile = rootProject.file("keystore.properties")
+val keystoreProperties = Properties()
+keystoreProperties.load(FileInputStream(keystorePropertiesFile))
+
 android {
     signingConfigs {
         create("release") {
-            storeFile = file("/Users/vadvergasov/Documents/VadVergasov.jks")
-            keyPassword = "VadimV2003"
-            keyAlias = "Main"
-            storePassword = "VadimV2003"
+            keyAlias = keystoreProperties["keyAlias"] as String
+            keyPassword = keystoreProperties["keyPassword"] as String
+            storeFile = file(keystoreProperties["storeFile"] as String)
+            storePassword = keystoreProperties["storePassword"] as String
         }
     }
     namespace = "com.vadvergasov.calculator"
