@@ -408,6 +408,8 @@ class MainActivity : AppCompatActivity() {
         clearHistory(menu)
         Toast.makeText(applicationContext, getString(R.string.sign_out_success), Toast.LENGTH_SHORT)
             .show()
+        binding.input.setText("")
+        binding.resultDisplay.text = ""
     }
 
     private fun keyVibration(view: View) {
