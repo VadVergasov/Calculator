@@ -28,8 +28,8 @@ android {
         applicationId = "com.vadvergasov.calculator"
         minSdk = 24
         targetSdk = 34
-        versionCode = 3
-        versionName = "2.0"
+        versionCode = 4
+        versionName = "2.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         signingConfig = signingConfigs.getByName("debug")
@@ -81,6 +81,7 @@ dependencies {
     implementation("com.google.firebase:firebase-auth")
     implementation("com.google.firebase:firebase-crashlytics")
     implementation("com.google.firebase:firebase-firestore")
+    implementation("com.google.firebase:firebase-messaging:24.0.0")
 
     implementation("com.google.android.gms:play-services-auth:21.1.1")
     implementation("com.google.android.libraries.identity.googleid:googleid:1.1.0")
