@@ -3,6 +3,12 @@
     <string name="app_name_display">Калькулятор</string>
 
     <string name="menu_clear_history">Очистить историю</string>
+    <string name="menu_sign_in">Войти</string>
+    <string name="menu_sign_out">Выйти</string>
+    <string name="sign_in_success">Вы вошли!</string>
+    <string name="sign_out_success">Вы вышли!</string>
+    <string name="something_went_wrong">Что-то пошло не так</string>
+    <string name="cleared_history">История очищена</string>
 
     <string name="division_by_0">Нельзя делить на 0</string>
     <string name="domain_error">Ошибка значения</string>

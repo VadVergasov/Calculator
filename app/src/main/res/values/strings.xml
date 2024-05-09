@@ -49,6 +49,12 @@
     <string name="logarithmInv" translatable="false">10^</string>
 
     <string name="menu_clear_history">Clear History</string>
+    <string name="menu_sign_in">Sign in</string>
+    <string name="menu_sign_out">Sign out</string>
+    <string name="sign_in_success">You are sign in!</string>
+    <string name="sign_out_success">You are sign out!</string>
+    <string name="something_went_wrong">Something went wrong</string>
+    <string name="cleared_history">Cleared history</string>
 
     <!-- Error messages -->
     <string name="division_by_0">Can\'t divide by 0</string>
@@ -65,4 +71,6 @@
     <string name="value_copied">Copied</string>
     <string name="infinity">Infinity</string>
     <string name="require_real_number">Real number required</string>
+
+    <string name="CLIENT_ID" translatable="false">826624221527-5hl04knp4ctv5l3pu7c1pmlt1pje63ri.apps.googleusercontent.com</string>
 </resources>

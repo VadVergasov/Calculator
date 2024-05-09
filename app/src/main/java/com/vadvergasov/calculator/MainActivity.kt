@@ -5,6 +5,7 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.ClipData
 import android.content.ClipboardManager
+import android.content.ContentValues.TAG
 import android.content.Context
 import android.content.SharedPreferences
 import android.hardware.Sensor
@@ -15,6 +16,7 @@ import android.os.Build
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.HapticFeedbackConstants
 import android.view.MenuItem
 import android.view.View
@@ -25,29 +27,43 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.PopupMenu
 import androidx.core.content.ContextCompat
-import androidx.preference.PreferenceManager
+import androidx.credentials.CredentialManager
+import androidx.credentials.GetCredentialRequest
+import androidx.credentials.exceptions.GetCredentialException
 import androidx.lifecycle.lifecycleScope
+import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.libraries.identity.googleid.GetGoogleIdOption
+import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
+import com.google.android.libraries.identity.googleid.GoogleIdTokenParsingException
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.analytics.ktx.analytics
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.GoogleAuthProvider
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.google.gson.Gson
-import com.vadvergasov.calculator.databinding.ActivityMainBinding
 import com.sothree.slidinguppanel.PanelSlideListener
 import com.sothree.slidinguppanel.PanelState
+import com.vadvergasov.calculator.databinding.ActivityMainBinding
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.math.BigDecimal
 import java.math.RoundingMode
+import java.security.MessageDigest
 import java.text.DecimalFormatSymbols
+import java.util.UUID
 import kotlin.math.sqrt
+
 
 var currentTheme: Int = 0
 
 class MainActivity : AppCompatActivity() {
-    private val KEY_HISTORY = "vadvergasov.calculator.HISTORY";
-    private val KEY_HISTORY_SIZE = "vadvergasov.calculator.HISTORY_SIZE";
+    private val KEY_HISTORY = "vadvergasov.calculator.HISTORY"
+    private val KEY_HISTORY_SIZE = "vadvergasov.calculator.HISTORY_SIZE"
 
     private lateinit var view: View
 
@@ -64,7 +80,7 @@ class MainActivity : AppCompatActivity() {
 
     private var historySize: String?
         set(value) = preferences!!.edit().putString(KEY_HISTORY_SIZE, value).apply()
-        get() =  preferences?.getString(KEY_HISTORY_SIZE, null);
+        get() = preferences?.getString(KEY_HISTORY_SIZE, null)
 
     private var isInvButtonClicked = false
     private var isEqualLastAction = false
@@ -83,6 +99,8 @@ class MainActivity : AppCompatActivity() {
     private var lastAcceleration = 0f
 
     private lateinit var firebaseAnalytics: FirebaseAnalytics
+    private lateinit var auth: FirebaseAuth
+    private val db = Firebase.firestore
 
     private val sensorListener: SensorEventListener = object : SensorEventListener {
         override fun onSensorChanged(event: SensorEvent) {
@@ -102,6 +120,7 @@ class MainActivity : AppCompatActivity() {
                 binding.resultDisplay.text = ""
             }
         }
+
         override fun onAccuracyChanged(sensor: Sensor, accuracy: Int) {}
     }
 
@@ -113,6 +132,7 @@ class MainActivity : AppCompatActivity() {
         sensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
 
         firebaseAnalytics = Firebase.analytics
+        auth = Firebase.auth
 
         super.onCreate(savedInstanceState)
 
@@ -256,6 +276,12 @@ class MainActivity : AppCompatActivity() {
         val inflater = popup.menuInflater
         inflater.inflate(R.menu.app_menu, popup.menu)
         popup.show()
+
+        if (auth.currentUser != null) {
+            popup.menu.findItem(R.id.app_menu_sign_in_button).setVisible(false)
+        } else {
+            popup.menu.findItem(R.id.app_menu_sign_out_button).setVisible(false)
+        }
     }
 
     fun clearHistory(@Suppress("UNUSED_PARAMETER") menu: MenuItem) {
@@ -263,6 +289,125 @@ class MainActivity : AppCompatActivity() {
         saveHistory(mutableListOf())
         // Clear drawer
         historyAdapter.clearHistory()
+
+        if (auth.currentUser != null) {
+            db.collection("default").document(auth.currentUser!!.uid).delete()
+                .addOnSuccessListener {
+                    Log.e(
+                        TAG,
+                        "Cleared history from firebase"
+                    )
+                }.addOnFailureListener { e -> Log.e(TAG, "Failure on clearing: ${e.message}") }
+        } else {
+            Log.e(TAG, "User isn't signed in, can't clear history")
+        }
+
+        Toast.makeText(applicationContext, getString(R.string.cleared_history), Toast.LENGTH_SHORT).show()
+    }
+
+    fun signIn(@Suppress("UNUSED_PARAMETER") menu: MenuItem) {
+        val credentialManager = CredentialManager.create(applicationContext)
+
+        val rawNonce = UUID.randomUUID().toString()
+        val bytes = rawNonce.toByteArray()
+        val hash = MessageDigest.getInstance("SHA-256")
+        val digest = hash.digest(bytes)
+        val hashed = digest.fold("") { str, it ->
+            str + "%02x".format(it)
+        }
+
+        val googleIdOption: GetGoogleIdOption = GetGoogleIdOption.Builder()
+            .setFilterByAuthorizedAccounts(false)
+            .setServerClientId(getString(R.string.CLIENT_ID))
+            .setNonce(hashed)
+            .build()
+
+        val request: GetCredentialRequest = GetCredentialRequest.Builder()
+            .addCredentialOption(googleIdOption)
+            .build()
+
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val result = credentialManager.getCredential(
+                    request = request,
+                    context = this@MainActivity,
+                )
+                val credential = result.credential
+
+                val googleIdTokenCredential = GoogleIdTokenCredential.createFrom(credential.data)
+
+                val googleIdToken = googleIdTokenCredential.idToken
+
+                Log.e(TAG, googleIdToken)
+
+                val firebaseCredential = GoogleAuthProvider.getCredential(googleIdToken, null)
+                auth.signInWithCredential(firebaseCredential).addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        Log.e(TAG, "Success")
+                        runOnUiThread {
+                            Toast.makeText(
+                                applicationContext,
+                                getString(R.string.sign_in_success),
+                                Toast.LENGTH_SHORT
+                            )
+                                .show()
+                            var history: String
+                            db.collection("default").document(auth.currentUser!!.uid).get()
+                                .addOnSuccessListener { document ->
+                                    Log.e(
+                                        TAG,
+                                        "Read history from firebase: ${document.data}"
+                                    )
+                                    if (document.data != null) {
+                                        history = document.data!!["history"].toString()
+                                        this@MainActivity.history = history
+                                        this@MainActivity.historyAdapter.appendHistory(
+                                            Gson().fromJson(
+                                                history,
+                                                Array<History>::class.java
+                                            ).asList().toMutableList()
+                                        )
+                                        if (historyAdapter.itemCount > 0) {
+                                            binding.historyRecylcleView.scrollToPosition(
+                                                historyAdapter.itemCount - 1
+                                            )
+                                        }
+                                    }
+                                }.addOnFailureListener { e ->
+                                    Log.e(TAG, "Failure on reading: ${e.message}")
+                                }
+                        }
+                    } else {
+                        Log.e(TAG, "Error")
+                        runOnUiThread {
+                            Toast.makeText(
+                                applicationContext,
+                                getString(R.string.something_went_wrong),
+                                Toast.LENGTH_SHORT
+                            )
+                                .show()
+                        }
+                    }
+                }
+            } catch (e: GetCredentialException) {
+                runOnUiThread {
+                    Toast.makeText(applicationContext, e.message, Toast.LENGTH_SHORT).show()
+                }
+                Log.e(TAG, e.message.toString())
+            } catch (e: GoogleIdTokenParsingException) {
+                runOnUiThread {
+                    Toast.makeText(applicationContext, e.message, Toast.LENGTH_SHORT).show()
+                }
+                Log.e(TAG, e.message.toString())
+            }
+        }
+    }
+
+    fun signOut(menu: MenuItem) {
+        auth.signOut()
+        clearHistory(menu)
+        Toast.makeText(applicationContext, getString(R.string.sign_out_success), Toast.LENGTH_SHORT)
+            .show()
     }
 
     private fun keyVibration(view: View) {
@@ -956,8 +1101,10 @@ class MainActivity : AppCompatActivity() {
 
     // Update settings
     override fun onResume() {
-        sensorManager?.registerListener(sensorListener, sensorManager!!.getDefaultSensor(
-            Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_NORMAL
+        sensorManager?.registerListener(
+            sensorListener, sensorManager!!.getDefaultSensor(
+                Sensor.TYPE_ACCELEROMETER
+            ), SensorManager.SENSOR_DELAY_NORMAL
         )
         super.onResume()
 
@@ -994,7 +1141,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun saveHistory(history: List<History>){
+    private fun saveHistory(history: List<History>) {
         val gson = Gson()
         val history2 = history.toMutableList()
         while (historySize!!.toInt() > 0 && history2.size > historySize!!.toInt()) {
@@ -1002,6 +1149,20 @@ class MainActivity : AppCompatActivity() {
         }
         val test: String = gson.toJson(history2)
         this.history = test // Convert to json
+        if (auth.currentUser != null) {
+            val data = hashMapOf(
+                "history" to test,
+            )
+            db.collection("default").document(auth.currentUser!!.uid).set(data as Map<String, Any>)
+                .addOnSuccessListener {
+                    Log.e(
+                        TAG,
+                        "Saved history to firebase"
+                    )
+                }.addOnFailureListener { e -> Log.e(TAG, "Failure on saving: ${e.message}") }
+        } else {
+            Log.e(TAG, "User isn't signed in, can't save history")
+        }
     }
 
 }

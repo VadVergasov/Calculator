@@ -7,4 +7,16 @@
         android:onClick="clearHistory"
         />
 
+    <item
+        android:id="@+id/app_menu_sign_in_button"
+        android:title="@string/menu_sign_in"
+        android:onClick="signIn"
+        />
+
+    <item
+        android:id="@+id/app_menu_sign_out_button"
+        android:title="@string/menu_sign_out"
+        android:onClick="signOut"
+        />
+
 </menu>
