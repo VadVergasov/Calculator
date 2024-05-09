@@ -29,9 +29,12 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.PopupMenu
+import androidx.biometric.BiometricManager
+import androidx.biometric.BiometricPrompt
 import androidx.core.content.ContextCompat
 import androidx.credentials.CredentialManager
 import androidx.credentials.GetCredentialRequest
+import androidx.credentials.GetPublicKeyCredentialOption
 import androidx.credentials.exceptions.GetCredentialException
 import androidx.lifecycle.lifecycleScope
 import androidx.preference.PreferenceManager
@@ -107,11 +110,31 @@ class MainActivity : AppCompatActivity() {
     private lateinit var auth: FirebaseAuth
     private val db = Firebase.firestore
 
+    private lateinit var biometricPrompt: BiometricPrompt
+
     private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission(),
     ) { isGranted: Boolean ->
         if (!isGranted) {
-            Toast.makeText(applicationContext, getString(R.string.no_notifications), Toast.LENGTH_SHORT).show()
+            Toast.makeText(
+                applicationContext,
+                getString(R.string.no_notifications),
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+    }
+
+    private fun checkBiometricInDevice(): Boolean {
+        val biometricManager = BiometricManager.from(this)
+
+        return when (biometricManager.canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_STRONG)) {
+            BiometricManager.BIOMETRIC_SUCCESS -> {
+                true
+            }
+
+            else -> {
+                false
+            }
         }
     }
 
@@ -329,7 +352,8 @@ class MainActivity : AppCompatActivity() {
             Log.e(TAG, "User isn't signed in, can't clear history")
         }
 
-        Toast.makeText(applicationContext, getString(R.string.cleared_history), Toast.LENGTH_SHORT).show()
+        Toast.makeText(applicationContext, getString(R.string.cleared_history), Toast.LENGTH_SHORT)
+            .show()
     }
 
     fun signIn(@Suppress("UNUSED_PARAMETER") menu: MenuItem) {
@@ -430,13 +454,67 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun createBiometricPromptInfo(): BiometricPrompt.PromptInfo {
+        return BiometricPrompt.PromptInfo.Builder()
+            .setTitle(getString(R.string.menu_sign_out))
+//            .setNegativeButtonText("Cancel")
+            .setAllowedAuthenticators(BiometricManager.Authenticators.BIOMETRIC_STRONG or BiometricManager.Authenticators.DEVICE_CREDENTIAL)
+            .build()
+    }
+
     fun signOut(menu: MenuItem) {
-        auth.signOut()
-        clearHistory(menu)
-        Toast.makeText(applicationContext, getString(R.string.sign_out_success), Toast.LENGTH_SHORT)
-            .show()
-        binding.input.setText("")
-        binding.resultDisplay.text = ""
+        if (checkBiometricInDevice()) {
+            val biometricPromt = BiometricPrompt(
+                this@MainActivity,
+                ContextCompat.getMainExecutor(this),
+                object : BiometricPrompt.AuthenticationCallback() {
+                    override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
+                        runOnUiThread {
+                            auth.signOut()
+                            clearHistory(menu)
+                            Toast.makeText(
+                                applicationContext,
+                                getString(R.string.sign_out_success),
+                                Toast.LENGTH_SHORT
+                            )
+                                .show()
+                            binding.input.setText("")
+                            binding.resultDisplay.text = ""
+                        }
+                    }
+
+                    override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
+                        Toast.makeText(
+                            this@MainActivity,
+                            getString(R.string.something_went_wrong),
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        Log.e(TAG, "Error: ${errorCode}, $errString")
+                    }
+
+                    override fun onAuthenticationFailed() {
+                        Toast.makeText(
+                            this@MainActivity,
+                            getString(R.string.something_went_wrong),
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                }
+            )
+
+            biometricPromt.authenticate(createBiometricPromptInfo())
+        } else {
+            auth.signOut()
+            clearHistory(menu)
+            Toast.makeText(
+                applicationContext,
+                getString(R.string.sign_out_success),
+                Toast.LENGTH_SHORT
+            )
+                .show()
+            binding.input.setText("")
+            binding.resultDisplay.text = ""
+        }
     }
 
     private fun keyVibration(view: View) {
