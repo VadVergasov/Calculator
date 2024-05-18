@@ -43,11 +43,6 @@ class HistoryAdapter(
         notifyDataSetChanged()
     }
 
-    fun removeFirstHistoryElement() {
-        this.history.removeAt(0)
-        notifyDataSetChanged()
-    }
-
     fun clearHistory() {
         this.history.clear()
         notifyDataSetChanged()
@@ -61,7 +56,7 @@ class HistoryAdapter(
         private val sameDateSeparator: View =
             itemView.findViewById(R.id.history_same_date_separator)
 
-        fun wrapInParenthesis(string: String): String {
+        private fun wrapInParenthesis(string: String): String {
             // Verify it is not already in parenthesis
             return if (string.first() != '(' || string.last() != ')') {
                 "($string)"
@@ -75,7 +70,7 @@ class HistoryAdapter(
             calculation.text = historyElement.calculation
             result.text = historyElement.result
             // To avoid crashes with former histories that do not have stored dates
-            if (historyElement.time.isNullOrEmpty()) {
+            if (historyElement.time.isEmpty()) {
                 time.visibility = View.GONE
             } else {
                 time.text = DateUtils.getRelativeTimeSpanString(
@@ -87,7 +82,7 @@ class HistoryAdapter(
                 // Check if the former result has the same date -> hide the date
                 if (position > 0) {
                     if (
-                        !history[position - 1].time.isNullOrEmpty()
+                        history[position - 1].time.isNotEmpty()
                         && DateUtils.getRelativeTimeSpanString(
                             history[position - 1].time.toLong(),
                             System.currentTimeMillis(),

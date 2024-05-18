@@ -89,8 +89,8 @@ class Calculator(
             fun parseExpression(): BigDecimal {
                 var x = parseTerm()
                 while (true) {
-                    if (eat('+'.code)) x = x.add(parseTerm()) // addition
-                    else if (eat('-'.code)) x = x.subtract(parseTerm()) // subtraction
+                    x = if (eat('+'.code)) x.add(parseTerm()) // addition
+                    else if (eat('-'.code)) x.subtract(parseTerm()) // subtraction
                     else return x
                 }
             }
@@ -186,7 +186,7 @@ class Calculator(
                             }
                         }
                         "logten" -> {
-                            if (x.compareTo(BigDecimal.ZERO) == 0) {
+                            if (x <= BigDecimal.ZERO) {
                                 domain_error = true
                             } else {
                                 x = BigDecimal(log10(x.toDouble()))
@@ -196,21 +196,21 @@ class Calculator(
                             x = BigDecimal(exp(x.toDouble()))
                         }
                         "sin" -> {
-                            if (isDegreeModeActivated) {
-                                x = sin(Math.toRadians(x.toDouble())).toBigDecimal()
+                            x = if (isDegreeModeActivated) {
+                                sin(Math.toRadians(x.toDouble())).toBigDecimal()
                                 // https://stackoverflow.com/questions/29516222/how-to-get-exact-value-of-trigonometric-functions-in-java
                             } else {
-                                x = sin(x.toDouble()).toBigDecimal()
+                                sin(x.toDouble()).toBigDecimal()
                             }
                             if (x > BigDecimal.ZERO && x < BigDecimal(1.0E-14)) {
                                 x = round(x.toDouble()).toBigDecimal()
                             }
                         }
                         "cos" -> {
-                            if (isDegreeModeActivated) {
-                                x = cos(Math.toRadians(x.toDouble())).toBigDecimal()
+                            x = if (isDegreeModeActivated) {
+                                cos(Math.toRadians(x.toDouble())).toBigDecimal()
                             } else {
-                                x = cos(x.toDouble()).toBigDecimal()
+                                cos(x.toDouble()).toBigDecimal()
                             }
                             if (x > BigDecimal.ZERO && x < BigDecimal(1.0E-14)) {
                                 x = round(x.toDouble()).toBigDecimal()

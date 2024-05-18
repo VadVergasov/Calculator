@@ -34,7 +34,6 @@ import androidx.biometric.BiometricPrompt
 import androidx.core.content.ContextCompat
 import androidx.credentials.CredentialManager
 import androidx.credentials.GetCredentialRequest
-import androidx.credentials.GetPublicKeyCredentialOption
 import androidx.credentials.exceptions.GetCredentialException
 import androidx.lifecycle.lifecycleScope
 import androidx.preference.PreferenceManager
@@ -70,8 +69,10 @@ import kotlin.math.sqrt
 var currentTheme: Int = 0
 
 class MainActivity : AppCompatActivity() {
-    private val KEY_HISTORY = "vadvergasov.calculator.HISTORY"
-    private val KEY_HISTORY_SIZE = "vadvergasov.calculator.HISTORY_SIZE"
+    object HistoryParams {
+        const val KEY_HISTORY = "vadvergasov.calculator.HISTORY"
+        const val KEY_HISTORY_SIZE = "vadvergasov.calculator.HISTORY_SIZE"
+    }
 
     private lateinit var view: View
 
@@ -83,12 +84,12 @@ class MainActivity : AppCompatActivity() {
     private var preferences: SharedPreferences? = null
 
     private var history: String?
-        set(value) = preferences!!.edit().putString(KEY_HISTORY, value).apply()
-        get() = preferences?.getString(KEY_HISTORY, null)
+        set(value) = preferences!!.edit().putString(HistoryParams.KEY_HISTORY, value).apply()
+        get() = preferences?.getString(HistoryParams.KEY_HISTORY, null)
 
     private var historySize: String?
-        set(value) = preferences!!.edit().putString(KEY_HISTORY_SIZE, value).apply()
-        get() = preferences?.getString(KEY_HISTORY_SIZE, null)
+        set(value) = preferences!!.edit().putString(HistoryParams.KEY_HISTORY_SIZE, value).apply()
+        get() = preferences?.getString(HistoryParams.KEY_HISTORY_SIZE, null)
 
     private var isInvButtonClicked = false
     private var isEqualLastAction = false
@@ -109,8 +110,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var firebaseAnalytics: FirebaseAnalytics
     private lateinit var auth: FirebaseAuth
     private val db = Firebase.firestore
-
-    private lateinit var biometricPrompt: BiometricPrompt
 
     private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission(),
@@ -162,8 +161,8 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         preferences = PreferenceManager.getDefaultSharedPreferences(applicationContext)
-        history = preferences?.getString(KEY_HISTORY, null)
-        historySize = preferences?.getString(KEY_HISTORY_SIZE, "100")
+        history = preferences?.getString(HistoryParams.KEY_HISTORY, null)
+        historySize = preferences?.getString(HistoryParams.KEY_HISTORY_SIZE, "100")
 
         sensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
 
@@ -187,7 +186,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         // Themes
-        val themes = Themes(this)
+        val themes = Themes()
         setTheme(themes.getTheme())
 
         currentTheme = themes.getTheme()
@@ -457,14 +456,13 @@ class MainActivity : AppCompatActivity() {
     private fun createBiometricPromptInfo(): BiometricPrompt.PromptInfo {
         return BiometricPrompt.PromptInfo.Builder()
             .setTitle(getString(R.string.menu_sign_out))
-//            .setNegativeButtonText("Cancel")
             .setAllowedAuthenticators(BiometricManager.Authenticators.BIOMETRIC_STRONG or BiometricManager.Authenticators.DEVICE_CREDENTIAL)
             .build()
     }
 
     fun signOut(menu: MenuItem) {
         if (checkBiometricInDevice()) {
-            val biometricPromt = BiometricPrompt(
+            val biometricPrompt = BiometricPrompt(
                 this@MainActivity,
                 ContextCompat.getMainExecutor(this),
                 object : BiometricPrompt.AuthenticationCallback() {
@@ -502,7 +500,7 @@ class MainActivity : AppCompatActivity() {
                 }
             )
 
-            biometricPromt.authenticate(createBiometricPromptInfo())
+            biometricPrompt.authenticate(createBiometricPromptInfo())
         } else {
             auth.signOut()
             clearHistory(menu)
@@ -1216,7 +1214,7 @@ class MainActivity : AppCompatActivity() {
         super.onResume()
 
         // Update the theme
-        val themes = Themes(this)
+        val themes = Themes()
         if (currentTheme != themes.getTheme()) {
             (this as Activity).finish()
             ContextCompat.startActivity(this, this.intent, null)
@@ -1241,7 +1239,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun getHistory(): MutableList<History> {
         val gson = Gson()
-        return if (preferences?.getString(KEY_HISTORY, null) != null) {
+        return if (preferences?.getString(HistoryParams.KEY_HISTORY, null) != null) {
             gson.fromJson(history, Array<History>::class.java).asList().toMutableList()
         } else {
             mutableListOf()
@@ -1274,13 +1272,13 @@ class MainActivity : AppCompatActivity() {
 
     private fun askPermissions() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) ==
-                PackageManager.PERMISSION_GRANTED
+            if (ContextCompat.checkSelfPermission(
+                    this,
+                    Manifest.permission.POST_NOTIFICATIONS
+                ) != PackageManager.PERMISSION_GRANTED && !(shouldShowRequestPermissionRationale(
+                    Manifest.permission.POST_NOTIFICATIONS
+                ))
             ) {
-
-            } else if (shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS)) {
-
-            } else {
                 requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
             }
         }
