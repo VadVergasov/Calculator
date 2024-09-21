@@ -76,30 +76,30 @@ android {
 }
 
 dependencies {
-    implementation(platform("com.google.firebase:firebase-bom:33.0.0"))
+    implementation(platform("com.google.firebase:firebase-bom:33.3.0"))
     implementation("com.google.firebase:firebase-analytics")
     implementation("com.google.firebase:firebase-auth")
     implementation("com.google.firebase:firebase-crashlytics")
     implementation("com.google.firebase:firebase-firestore")
-    implementation("com.google.firebase:firebase-messaging:24.0.0")
+    implementation("com.google.firebase:firebase-messaging:24.0.1")
 
-    implementation("com.google.android.gms:play-services-auth:21.1.1")
-    implementation("com.google.android.libraries.identity.googleid:googleid:1.1.0")
+    implementation("com.google.android.gms:play-services-auth:21.2.0")
+    implementation("com.google.android.libraries.identity.googleid:googleid:1.1.1")
 
-    implementation("androidx.credentials:credentials:1.3.0-alpha03")
+    implementation("androidx.credentials:credentials:1.3.0-rc01")
     // Android 13 and below.
-    implementation("androidx.credentials:credentials-play-services-auth:1.3.0-alpha03")
+    implementation("androidx.credentials:credentials-play-services-auth:1.3.0-rc01")
 
     implementation("androidx.biometric:biometric:1.2.0-alpha05")
 
     implementation("androidx.core:core-ktx:1.13.1")
-    implementation("androidx.appcompat:appcompat:1.6.1")
+    implementation("androidx.appcompat:appcompat:1.7.0")
     implementation("androidx.preference:preference-ktx:1.2.1")
     implementation("com.google.android.material:material:1.12.0")
     implementation("com.github.hannesa2:AndroidSlidingUpPanel:4.4.1")
     implementation("com.google.code.gson:gson:2.10.1")
     testImplementation("junit:junit:4.13.2")
 
-    androidTestImplementation("androidx.test.ext:junit:1.1.5")
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
+    androidTestImplementation("androidx.test.ext:junit:1.2.1")
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")
 }
