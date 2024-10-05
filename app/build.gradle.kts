@@ -64,31 +64,31 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
     }
 
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = "11"
     }
 
     buildToolsVersion = "34.0.0"
 }
 
 dependencies {
-    implementation(platform("com.google.firebase:firebase-bom:33.3.0"))
+    implementation(platform("com.google.firebase:firebase-bom:33.4.0"))
     implementation("com.google.firebase:firebase-analytics")
     implementation("com.google.firebase:firebase-auth")
     implementation("com.google.firebase:firebase-crashlytics")
     implementation("com.google.firebase:firebase-firestore")
-    implementation("com.google.firebase:firebase-messaging:24.0.1")
+    implementation("com.google.firebase:firebase-messaging:24.0.2")
 
     implementation("com.google.android.gms:play-services-auth:21.2.0")
     implementation("com.google.android.libraries.identity.googleid:googleid:1.1.1")
 
-    implementation("androidx.credentials:credentials:1.3.0-rc01")
+    implementation("androidx.credentials:credentials:1.3.0")
     // Android 13 and below.
-    implementation("androidx.credentials:credentials-play-services-auth:1.3.0-rc01")
+    implementation("androidx.credentials:credentials-play-services-auth:1.3.0")
 
     implementation("androidx.biometric:biometric:1.2.0-alpha05")
 
