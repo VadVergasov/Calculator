@@ -28,8 +28,8 @@ android {
         applicationId = "com.vadvergasov.calculator"
         minSdk = 24
         targetSdk = 34
-        versionCode = 6
-        versionName = "2.2.1"
+        versionCode = 7
+        versionName = "2.2.2"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         signingConfig = signingConfigs.getByName("debug")
@@ -72,7 +72,7 @@ android {
         jvmTarget = "11"
     }
 
-    buildToolsVersion = "34.0.0"
+    buildToolsVersion = "35.0.0"
 }
 
 dependencies {
