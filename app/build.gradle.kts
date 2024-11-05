@@ -22,14 +22,14 @@ android {
         }
     }
     namespace = "com.vadvergasov.calculator"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.vadvergasov.calculator"
         minSdk = 24
-        targetSdk = 34
-        versionCode = 7
-        versionName = "2.2.2"
+        targetSdk = 35
+        versionCode = 8
+        versionName = "2.2.3"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         signingConfig = signingConfigs.getByName("debug")
@@ -76,12 +76,12 @@ android {
 }
 
 dependencies {
-    implementation(platform("com.google.firebase:firebase-bom:33.4.0"))
+    implementation(platform("com.google.firebase:firebase-bom:33.5.1"))
     implementation("com.google.firebase:firebase-analytics")
     implementation("com.google.firebase:firebase-auth")
     implementation("com.google.firebase:firebase-crashlytics")
     implementation("com.google.firebase:firebase-firestore")
-    implementation("com.google.firebase:firebase-messaging:24.0.2")
+    implementation("com.google.firebase:firebase-messaging:24.0.3")
 
     implementation("com.google.android.gms:play-services-auth:21.2.0")
     implementation("com.google.android.libraries.identity.googleid:googleid:1.1.1")
@@ -92,7 +92,7 @@ dependencies {
 
     implementation("androidx.biometric:biometric:1.2.0-alpha05")
 
-    implementation("androidx.core:core-ktx:1.13.1")
+    implementation("androidx.core:core-ktx:1.15.0")
     implementation("androidx.appcompat:appcompat:1.7.0")
     implementation("androidx.preference:preference-ktx:1.2.1")
     implementation("com.google.android.material:material:1.12.0")
