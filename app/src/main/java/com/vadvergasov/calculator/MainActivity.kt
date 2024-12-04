@@ -729,9 +729,8 @@ class MainActivity : AppCompatActivity() {
 
                 } else withContext(Dispatchers.Main) {
                     if (is_infinity && !division_by_0 && !domain_error && !require_real_number) {
-                        if (calculationResult < BigDecimal.ZERO) binding.resultDisplay.text =
-                            "-" + getString(
-                                R.string.infinity
+                        if (calculationResult < BigDecimal.ZERO) binding.resultDisplay.text = getString(
+                                R.string.negative_infinity
                             )
                         else binding.resultDisplay.text = getString(R.string.value_too_large)
                     } else {
@@ -806,17 +805,17 @@ class MainActivity : AppCompatActivity() {
                     // Add a parenthesis if there is another symbol before minus
                     if (currentSymbol == "-") {
                         if (previousChar in "+-") {
-                            binding.input.setText(leftString + currentSymbol + rightString)
+                            binding.input.setText(getString(R.string.three_strings, leftString, currentSymbol, rightString))
                             binding.input.setSelection(cursorPosition)
                         } else {
-                            binding.input.setText(leftString + previousChar + currentSymbol + rightString)
+                            binding.input.setText(getString(R.string.four_strings, leftString, previousChar, currentSymbol, rightString))
                             binding.input.setSelection(cursorPosition + 1)
                         }
                     } else if (cursorPosition > 1 && binding.input.text[cursorPosition - 2] != '(') {
-                        binding.input.setText(leftString + currentSymbol + rightString)
+                        binding.input.setText(getString(R.string.three_strings, leftString, currentSymbol, rightString))
                         binding.input.setSelection(cursorPosition)
                     } else if (currentSymbol == "+") {
-                        binding.input.setText(leftString + rightString)
+                        binding.input.setText(getString(R.string.two_strings, leftString, rightString))
                         binding.input.setSelection(cursorPosition - 1)
                     }
                 }
@@ -831,9 +830,9 @@ class MainActivity : AppCompatActivity() {
                         binding.input.text.subSequence(cursorPosition + 1, textLength).toString()
 
                     if (cursorPosition > 0 && previousChar != "(") {
-                        binding.input.setText(leftString + currentSymbol + rightString)
+                        binding.input.setText(getString(R.string.three_strings, leftString, currentSymbol, rightString))
                         binding.input.setSelection(cursorPosition + 1)
-                    } else if (currentSymbol == "+") binding.input.setText(leftString + rightString)
+                    } else if (currentSymbol == "+") binding.input.setText(getString(R.string.two_strings, leftString, rightString))
                 }
                 // Otherwise just update the display
                 else if (cursorPosition > 0 || nextChar != "0" && currentSymbol == "-") {

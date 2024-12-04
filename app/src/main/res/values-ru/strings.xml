@@ -21,6 +21,7 @@
 
     <string name="value_copied">Скопировано</string>
     <string name="infinity">Бесконечность</string>
+    <string name="negative_infinity">-Бесконечность</string>
     <string name="require_real_number">Необходимо вещественное число</string>
 
     <string name="default_notification_channel_id">Уведомления</string>

@@ -70,6 +70,7 @@
     <!-- Others -->
     <string name="value_copied">Copied</string>
     <string name="infinity">Infinity</string>
+    <string name="negative_infinity">-Infinity</string>
     <string name="require_real_number">Real number required</string>
 
     <string name="default_notification_channel_id">Notifications</string>
@@ -77,4 +78,8 @@
 
     <string name="CLIENT_ID" translatable="false">826624221527-5hl04knp4ctv5l3pu7c1pmlt1pje63ri.apps.googleusercontent.com</string>
     <string name="msg_token_fmt" translatable="false">FMT Token: %1$s</string>
+
+    <string name="two_strings" translatable="false">%1s %2s</string>
+    <string name="three_strings" translatable="false">%1s %2s %3s</string>
+    <string name="four_strings" translatable="false">%1s %2s %3s %4s</string>
 </resources>
