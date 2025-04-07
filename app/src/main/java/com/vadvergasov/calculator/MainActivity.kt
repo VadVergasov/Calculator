@@ -250,7 +250,7 @@ class MainActivity : AppCompatActivity() {
                 newState: PanelState
             ) {
                 if (newState == PanelState.ANCHORED) { // To prevent the panel from getting stuck in the middle
-                    binding.slidingLayout.panelState = PanelState.EXPANDED
+                    binding.slidingLayout.setPanelState(PanelState.EXPANDED)
                 }
             }
         })
