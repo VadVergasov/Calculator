@@ -22,14 +22,14 @@ android {
         }
     }
     namespace = "com.vadvergasov.calculator"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.vadvergasov.calculator"
         minSdk = 24
-        targetSdk = 35
-        versionCode = 8
-        versionName = "2.2.3"
+        targetSdk = 36
+        versionCode = 9
+        versionName = "2.2.4"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         signingConfig = signingConfigs.getByName("debug")
@@ -47,11 +47,17 @@ android {
             isJniDebuggable = false
             signingConfig = signingConfigs.getByName("release")
             multiDexEnabled = false
+            ndk {
+                debugSymbolLevel = "FULL"
+            }
         }
         debug {
 //            applicationIdSuffix = ".debug"
             signingConfig = signingConfigs.getByName("release")
             isDebuggable = true
+            ndk {
+                debugSymbolLevel = "FULL"
+            }
         }
     }
 
@@ -76,7 +82,7 @@ android {
 }
 
 dependencies {
-    implementation(platform("com.google.firebase:firebase-bom:33.12.0"))
+    implementation(platform("com.google.firebase:firebase-bom:33.13.0"))
     implementation("com.google.firebase:firebase-analytics")
     implementation("com.google.firebase:firebase-auth")
     implementation("com.google.firebase:firebase-crashlytics")
@@ -85,6 +91,7 @@ dependencies {
 
     implementation("com.google.android.gms:play-services-auth:21.3.0")
     implementation("com.google.android.libraries.identity.googleid:googleid:1.1.1")
+    implementation("com.google.android.play:integrity:1.4.0")
 
     implementation("androidx.credentials:credentials:1.5.0")
     // Android 13 and below.
@@ -92,12 +99,12 @@ dependencies {
 
     implementation("androidx.biometric:biometric:1.2.0-alpha05")
 
-    implementation("androidx.core:core-ktx:1.15.0")
+    implementation("androidx.core:core-ktx:1.16.0")
     implementation("androidx.appcompat:appcompat:1.7.0")
     implementation("androidx.preference:preference-ktx:1.2.1")
     implementation("com.google.android.material:material:1.12.0")
     implementation("com.github.hannesa2:AndroidSlidingUpPanel:4.7.1")
-    implementation("com.google.code.gson:gson:2.10.1")
+    implementation("com.google.code.gson:gson:2.11.0")
     testImplementation("junit:junit:4.13.2")
 
     androidTestImplementation("androidx.test.ext:junit:1.2.1")

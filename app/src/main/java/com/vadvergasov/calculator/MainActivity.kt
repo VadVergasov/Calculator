@@ -64,6 +64,7 @@ import java.security.MessageDigest
 import java.text.DecimalFormatSymbols
 import java.util.UUID
 import kotlin.math.sqrt
+import androidx.core.content.edit
 
 
 var currentTheme: Int = 0
@@ -84,11 +85,11 @@ class MainActivity : AppCompatActivity() {
     private var preferences: SharedPreferences? = null
 
     private var history: String?
-        set(value) = preferences!!.edit().putString(HistoryParams.KEY_HISTORY, value).apply()
+        set(value) = preferences!!.edit { putString(HistoryParams.KEY_HISTORY, value) }
         get() = preferences?.getString(HistoryParams.KEY_HISTORY, null)
 
     private var historySize: String?
-        set(value) = preferences!!.edit().putString(HistoryParams.KEY_HISTORY_SIZE, value).apply()
+        set(value) = preferences!!.edit { putString(HistoryParams.KEY_HISTORY_SIZE, value) }
         get() = preferences?.getString(HistoryParams.KEY_HISTORY_SIZE, null)
 
     private var isInvButtonClicked = false
