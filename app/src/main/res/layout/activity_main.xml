@@ -139,6 +139,7 @@
                         android:layout_height="match_parent"
                         android:layout_margin="0dp"
                         android:layout_weight="1"
+                        android:contentDescription="Exponent button"
                         android:onClick="exponentButton"
                         app:srcCompat="@drawable/exponent" />
 
@@ -162,6 +163,7 @@
                         android:layout_weight="0.6"
                         android:background="@drawable/circle"
                         android:backgroundTint="?attr/foreground_color"
+                        android:contentDescription="Scientist mode switch"
                         android:onClick="scientistModeSwitchButton"
                         android:textAllCaps="false"
                         android:textColor="?attr/text_color"
@@ -498,6 +500,7 @@
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
                         android:layout_weight="1"
+                        android:contentDescription="Point button"
                         android:onClick="pointButton" />
 
                     <ImageButton
@@ -539,16 +542,18 @@
                 android:layout_height="0dp"
                 android:layout_marginBottom="32dp"
                 android:background="?attr/history_background_color"
+                android:clipToPadding="false"
                 app:layout_constraintBottom_toTopOf="@+id/sliding_layout_button"
                 app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="1.0" />
 
             <View
                 android:id="@+id/sliding_layout_button"
                 android:layout_width="30dp"
                 android:layout_height="4dp"
-                android:layout_marginTop="24dp"
                 android:layout_marginBottom="15dp"
                 android:background="?attr/text_color"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -566,7 +571,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.18" />
+        app:layout_constraintGuide_percent="0.18194254" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline2"

@@ -28,8 +28,8 @@ android {
         applicationId = "com.vadvergasov.calculator"
         minSdk = 24
         targetSdk = 36
-        versionCode = 9
-        versionName = "2.2.4"
+        versionCode = 10
+        versionName = "2.2.5"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         signingConfig = signingConfigs.getByName("debug")
@@ -78,20 +78,20 @@ android {
         jvmTarget = "11"
     }
 
-    buildToolsVersion = "36.0.0"
+    buildToolsVersion = "36.1.0"
 }
 
 dependencies {
-    implementation(platform("com.google.firebase:firebase-bom:33.13.0"))
+    implementation(platform("com.google.firebase:firebase-bom:34.5.0"))
     implementation("com.google.firebase:firebase-analytics")
     implementation("com.google.firebase:firebase-auth")
     implementation("com.google.firebase:firebase-crashlytics")
     implementation("com.google.firebase:firebase-firestore")
-    implementation("com.google.firebase:firebase-messaging:24.1.1")
+    implementation("com.google.firebase:firebase-messaging:25.0.1")
 
-    implementation("com.google.android.gms:play-services-auth:21.3.0")
+    implementation("com.google.android.gms:play-services-auth:21.4.0")
     implementation("com.google.android.libraries.identity.googleid:googleid:1.1.1")
-    implementation("com.google.android.play:integrity:1.4.0")
+    implementation("com.google.android.play:integrity:1.5.0")
 
     implementation("androidx.credentials:credentials:1.5.0")
     // Android 13 and below.
@@ -99,14 +99,14 @@ dependencies {
 
     implementation("androidx.biometric:biometric:1.2.0-alpha05")
 
-    implementation("androidx.core:core-ktx:1.16.0")
-    implementation("androidx.appcompat:appcompat:1.7.0")
+    implementation("androidx.core:core-ktx:1.17.0")
+    implementation("androidx.appcompat:appcompat:1.7.1")
     implementation("androidx.preference:preference-ktx:1.2.1")
-    implementation("com.google.android.material:material:1.12.0")
+    implementation("com.google.android.material:material:1.13.0")
     implementation("com.github.hannesa2:AndroidSlidingUpPanel:4.7.1")
-    implementation("com.google.code.gson:gson:2.11.0")
+    implementation("com.google.code.gson:gson:2.13.2")
     testImplementation("junit:junit:4.13.2")
 
-    androidTestImplementation("androidx.test.ext:junit:1.2.1")
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")
+    androidTestImplementation("androidx.test.ext:junit:1.3.0")
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.7.0")
 }
