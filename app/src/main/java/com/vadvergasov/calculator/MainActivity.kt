@@ -3,11 +3,9 @@ package com.vadvergasov.calculator
 import android.animation.LayoutTransition
 import android.Manifest
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.ContentValues.TAG
-import android.content.Context
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.hardware.Sensor
@@ -38,6 +36,7 @@ import androidx.credentials.exceptions.GetCredentialException
 import androidx.lifecycle.lifecycleScope
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.core.content.IntentSanitizer
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
@@ -165,7 +164,7 @@ class MainActivity : AppCompatActivity() {
         history = preferences?.getString(HistoryParams.KEY_HISTORY, null)
         historySize = preferences?.getString(HistoryParams.KEY_HISTORY_SIZE, "100")
 
-        sensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
+        sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
 
         askPermissions()
 
@@ -328,9 +327,9 @@ class MainActivity : AppCompatActivity() {
         popup.show()
 
         if (auth.currentUser != null) {
-            popup.menu.findItem(R.id.app_menu_sign_in_button).setVisible(false)
+            popup.menu.findItem(R.id.app_menu_sign_in_button).isVisible = false
         } else {
-            popup.menu.findItem(R.id.app_menu_sign_out_button).setVisible(false)
+            popup.menu.findItem(R.id.app_menu_sign_out_button).isVisible = false
         }
     }
 
@@ -657,7 +656,7 @@ class MainActivity : AppCompatActivity() {
 
         binding.degreeTextView.text = binding.degreeButton.text
 
-        // Flip the variable afterwards
+        // Flip the variable afterward
         isDegreeModeActivated = !isDegreeModeActivated
     }
 
@@ -1216,8 +1215,13 @@ class MainActivity : AppCompatActivity() {
         // Update the theme
         val themes = Themes()
         if (currentTheme != themes.getTheme()) {
-            (this as Activity).finish()
-            ContextCompat.startActivity(this, this.intent, null)
+            finish()
+            val restartIntent = IntentSanitizer.Builder()
+                .allowAnyComponent()
+                .allowPackage(packageName)
+                .build()
+                .sanitizeByThrowing(intent)
+            startActivity(restartIntent)
         }
 
         binding.clearButton.visibility = View.VISIBLE
@@ -1253,7 +1257,7 @@ class MainActivity : AppCompatActivity() {
             history2.removeAt(0)
         }
         val test: String = gson.toJson(history2)
-        this.history = test // Convert to json
+        this.history = test // Convert to JSON
         if (auth.currentUser != null) {
             val data = hashMapOf(
                 "history" to test,

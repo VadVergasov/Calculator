@@ -3,7 +3,6 @@ import java.io.FileInputStream
 
 plugins {
     id("com.android.application")
-    id("org.jetbrains.kotlin.android")
     id("com.google.gms.google-services")
     id("com.google.firebase.crashlytics")
 }
@@ -22,14 +21,14 @@ android {
         }
     }
     namespace = "com.vadvergasov.calculator"
-    compileSdk = 36
+    compileSdk = 37
 
     defaultConfig {
         applicationId = "com.vadvergasov.calculator"
         minSdk = 24
-        targetSdk = 36
-        versionCode = 10
-        versionName = "2.2.5"
+        targetSdk = 37
+        versionCode = 11
+        versionName = "2.2.6"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         signingConfig = signingConfigs.getByName("debug")
@@ -67,39 +66,36 @@ android {
 
     buildFeatures {
         viewBinding = true
+        resValues = true
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
     }
 
-    kotlinOptions {
-        jvmTarget = "11"
-    }
-
-    buildToolsVersion = "36.1.0"
+    buildToolsVersion = "37.0.0"
 }
 
 dependencies {
-    implementation(platform("com.google.firebase:firebase-bom:34.5.0"))
+    implementation(platform("com.google.firebase:firebase-bom:34.12.0"))
     implementation("com.google.firebase:firebase-analytics")
     implementation("com.google.firebase:firebase-auth")
     implementation("com.google.firebase:firebase-crashlytics")
     implementation("com.google.firebase:firebase-firestore")
     implementation("com.google.firebase:firebase-messaging:25.0.1")
 
-    implementation("com.google.android.gms:play-services-auth:21.4.0")
-    implementation("com.google.android.libraries.identity.googleid:googleid:1.1.1")
-    implementation("com.google.android.play:integrity:1.5.0")
+    implementation("com.google.android.gms:play-services-auth:21.5.1")
+    implementation("com.google.android.libraries.identity.googleid:googleid:1.2.0")
+    implementation("com.google.android.play:integrity:1.6.0")
 
-    implementation("androidx.credentials:credentials:1.5.0")
+    implementation("androidx.credentials:credentials:1.6.0")
     // Android 13 and below.
-    implementation("androidx.credentials:credentials-play-services-auth:1.5.0")
+    implementation("androidx.credentials:credentials-play-services-auth:1.6.0")
 
     implementation("androidx.biometric:biometric:1.2.0-alpha05")
 
-    implementation("androidx.core:core-ktx:1.17.0")
+    implementation("androidx.core:core-ktx:1.18.0")
     implementation("androidx.appcompat:appcompat:1.7.1")
     implementation("androidx.preference:preference-ktx:1.2.1")
     implementation("com.google.android.material:material:1.13.0")
